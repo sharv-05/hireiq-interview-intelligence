@@ -3,6 +3,7 @@ uvicorn[standard]==0.34.0
 sqlalchemy==2.0.36
 pydantic==2.10.5
 python-multipart==0.0.20
+pydub==0.25.1
 pyyaml==6.0.2
 reportlab==4.2.5
 python-dotenv==1.0.1
