@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: hireiq
+      POSTGRES_USER: hireiq
+      POSTGRES_PASSWORD: hireiq
+    volumes: [hireiq-db:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hireiq -d hireiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://hireiq:hireiq@db:5432/hireiq
+      REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      CORS_ORIGINS: http://localhost:4173
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_started}
+  worker:
+    build: ./backend
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+psycopg://hireiq:hireiq@db:5432/hireiq
+      REDIS_URL: redis://redis:6379/0
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    depends_on: [api, redis]
+  frontend:
+    build: ./frontend
+    ports: ["4173:4173"]
+    depends_on: [api]
+volumes:
+  hireiq-db:

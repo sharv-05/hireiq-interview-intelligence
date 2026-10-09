@@ -1,0 +1,12 @@
+name: AI Engineer Core
+description: Balanced technical and behavioral evaluation
+criteria:
+  - name: Clarity
+    weight: 1
+    description: Structured, direct communication
+  - name: Technical depth
+    weight: 2
+    description: Correct engineering reasoning and system tradeoffs
+  - name: Evidence
+    weight: 1
+    description: Metrics, experiments, and verifiable examples
